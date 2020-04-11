@@ -1,12 +1,48 @@
-import React from 'react';
-
+import React, { useState, useEffect } from 'react';
+import api from './services/api';
+import './App.css';
 import Header from './components/Header'
 
-function App() {
+
+function App() { 
+
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    api.get('projects').then(response => {
+      setProjects(response.data);
+    });
+  }, [])
+
+  //useState retorna um array com 2 posicoes;
+  //
+  // 1. (projects) Variavel com seu valor inicial (['Desenvolvimento de App', 'Front-end web']);
+  // 2. (setProjects`) Funcao para atualizarmos esse valor 
+
+  async function handleAddProject() {
+    // ⬇️ projects.push(`Novo projeto ${Date.now()}`);
+    //setProjects([...projects, `Novo projeto ${Date.now()}` ]); //formato de imutabilidade
+    //Adicionando novo projeto
+
+    const response = await api.post('projects', {
+      title: `Novo projeto ${Date.now()}`,
+      owner: "Diego Fernandes"
+    });
+    
+    const project = response.data
+    setProjects([...projects, project]);
+
+  };
+
   return (
   <>
-    <Header />
-    <Header />
+    <Header title="Projects" />
+
+    <ul>
+      {projects.map(project => <li key={project.id}>{project.title}</li>)}
+    </ul>
+
+    <button type="button" onClick={handleAddProject}>Adicionar projeto </button>
   </>
   );
 };
